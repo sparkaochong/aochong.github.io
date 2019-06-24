@@ -1,11 +1,11 @@
 # Basic
-title: Louis
+title: aochong
 subtitle:
-welcome_message: <a href="https://github.com/louis-ly" target="_blank"></a>
-description: Louis的iOS开发小站
+welcome_message: <a href="https://github.com/sparkaochong" target="_blank"></a>
+description: 敖翀的个人技术博客
 creator: <a href="http://onev.cat">@onevcat</a>
 
-url: "http://louisly.com"
+url: "https://sparkaochong.github.io/aochong.github.io/"
 
 permalink: /:year/:month/:title/
 
@@ -35,16 +35,16 @@ paginate_path: "page/:num/"
 
 # Comment
 comment:
-    disqus: louis-ly
-    duoshuo: louis-ly
+    disqus: aochong
+    duoshuo: aochong
     
 # Social
 social:
-    weibo: louisCoder
-    github: louis-ly
-    twitter: louisCoder
-    gplus: 114566653125205042673
-    mail: 396868934@qq.com
+    weibo: aochongi
+    github: sparkaochong
+    twitter: 
+    gplus: 
+    mail: sparkaochong@gmail.com
 
 # Google Analytics
 ga:
