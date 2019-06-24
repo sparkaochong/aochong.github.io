@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>用Jekyll搭建的Github Pages个人博客</title>
+  <meta name="description" content="&emsp;&emsp;近半年一直忙于项目开发，不烙得空。近期慢慢清闲了，终于有机会可以写写属于自己的技术博客。">
+  <meta name="author" content="Wei Wang">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="用Jekyll搭建的Github Pages个人博客">
+  <meta name="twitter:description" content="&emsp;&emsp;近半年一直忙于项目开发，不烙得空。近期慢慢清闲了，终于有机会可以写写属于自己的技术博客。">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="用Jekyll搭建的Github Pages个人博客">
+  <meta property="og:description" content="&emsp;&emsp;近半年一直忙于项目开发，不烙得空。近期慢慢清闲了，终于有机会可以写写属于自己的技术博客。">
+  
+  <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
+  <link href="/assets/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://louisly.com/2016/04/used-jekyll-to-create-my-github-blog/">
+  <link rel="alternate" type="application/rss+xml" title="Louis" href="http://louisly.com/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+  
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">
+        <i class="fa fa-list btn-mobile-menu__icon"></i>
+        <i class="fa fa-angle-up btn-mobile-close__icon hidden"></i>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/assets/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <a href="/#blog" title="前往 Louis 的主页" class="blog-button"><img src="/assets/images/avatar.jpg" width="80" alt="Louis logo" class="panel-cover__logo logo" /></a>
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for Louis" class="blog-button">Louis</a></h1>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">Louis的iOS开发小站</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        <p class="panel-cover__description"><a href="https://github.com/louis-ly" target="_blank"></a></p>
+        
+        
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="Visit blog" class="blog-button">Blog</a></li>
+                
+              </ul>
+            </nav>
+          </div>
+          
+          <div><nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+  
+  <!-- Weibo -->
+  <li class="navigation__item">
+    <a href="http://weibo.com/louisCoder" title="@louisCoder 的微博" target="_blank">
+      <i class='social fa fa-weibo'></i>
+      <span class="label">Weibo</span>
+    </a>
+  </li>
+  
+
+  
+  <!-- Github -->
+  <li class="navigation__item">
+    <a href="https://github.com/louis-ly" title="@louis-ly 的 Github" target="_blank">
+      <i class='social fa fa-github'></i>
+      <span class="label">Github</span>
+    </a>
+  </li>
+  
+  
+  
+  <!-- Twitter -->
+  <li class="navigation__item">
+    <a href="http://twitter.com/louisCoder" title="@louisCoder" target="_blank">
+      <i class='social fa fa-twitter'></i>
+      <span class="label">Twitter</span>
+    </a>
+  </li>
+  
+
+  
+  <!-- Google Plus -->
+  <li class="navigation__item">
+    <a href="https://plus.google.com/114566653125205042673" rel="author" title="Google+" target="_blank">
+      <i class='social fa fa-google-plus-square'></i>
+      <span class="label">Google Plus</span>
+    </a>
+  </li>
+  
+
+  <!-- RSS -->
+  <li class="navigation__item">
+    <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+      <i class='social fa fa-rss'></i>
+      <span class="label">RSS</span>
+    </a>
+  </li>
+
+  
+  <!-- Email -->
+  <li class="navigation__item">
+    <a href="mailto:396868934@qq.com" title="Contact me">
+      <i class='social fa fa-envelope'></i>
+      <span class="label">Email</span>
+    </a>
+  </li>
+  
+
+  </ul>
+</nav>
+</div>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-disabled"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <div class="post-meta">
+      <time datetime="2016-04-16 10:11:11 +0800" itemprop="datePublished" class="post-meta__date date">2016-04-16</time> &#8226; <span class="post-meta__tags tags">Jekyll&emsp;Github</span>
+    </div>
+    <h1 class="post-title">用Jekyll搭建的Github Pages个人博客</h1>
+  </header>
+
+  <section class="post">
+    <p>&emsp;&emsp;近半年一直忙于项目开发，不烙得空。近期慢慢清闲了，终于有机会可以写写属于自己的技术博客。</p>
+
+<p>&emsp;&emsp;之前有打算在<a href="http://blog.csdn.net">CSDN</a>、<a href="http://www.cnblogs.com">cnblogs</a>等博客平台上写的，不过个人觉得界面设计、页面效果比较low，不符合我的审美观&lt;(￣▽￣)&gt;。也有考虑过在<a href="http://www.jianshu.com">简书</a>上面写，因为界面看着简约大方上档次的赶脚，平时也看到挺多简书里的技术文章。不过，简书首页写着“一个基于内容分析的社区”，也就是啥啥啥文章都有，不只是技术博客，额，给我感觉在上面写自己的技术博客不是很正宗（<del>No zuo，No die</del>）。依稀记得之前访问<a href="http://onevcat.com">喵神</a>的博客很有feel，如果能做一个他这样的个人博客网站就好了，于是就有了不拉不拉不拉的一通乱逛、乱转、乱撞，终于整出属于<a href="http://joe-liu.com">自己的博客</a>了，不过在这里要感谢喵神git上的提供的主题<a href="https://github.com/onevcat/vno-jekyll">Vno-Jekyll</a>。</p>
+
+<p>&emsp;&emsp;好了，其他废话不多说，下面就说一下搭建过程，然后你也可以拥有和我一模一样的博客了。</p>
+
+<p><strong>达到效果</strong>：</p>
+
+<ul>
+<li>1.自定义域名访问技术博客（joe-liu.com）</li>
+<li>2.Github二级域名访问博客（joe-liu.github.io）</li>
+</ul>
+
+<h3>一、Github Pages</h3>
+
+<p>&emsp;&emsp;GitHub Pages 可以为你或者你的项目提供介绍网页，它是由 GitHub 官方托管和发布的。你可以使用 GitHub 提供的页面自动生成器。也可以做个人博客，是个轻量级的博客系统，没有麻烦的配置。使用标记语言如Markdown，不需自己搭建服务器，还可以绑定自己的域名。</p>
+
+<blockquote>
+<p><a href="https://help.github.com/categories/github-pages-basics/">Github Pages - 官方配置指南</a><br>
+<a href="https://help.github.com/categories/customizing-github-pages/">Github Pages - 自定义页面指南</a><br>
+<a href="http://wiki.jikexueyuan.com/project/github-pages-basics/">极客学院翻译 - 中文版本指南</a></p>
+</blockquote>
+
+<h3>二、Github二级域名创建</h3>
+
+<p>&emsp;&emsp;这个步骤比较简单，<a href="https://pages.github.com">Github Pages</a>官网首页就有图文说明。</p>
+
+<ul>
+<li><p>1.打开创建代码仓库页面
+<img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2xvg9vqjfj214w0v0dmt.jpg" alt="repo1 icon">
+&emsp;&emsp;在红框的位置输入-&gt;<code>(你的用户名).github.io</code>  点击<code>Create repository</code>。（用户名就是红框左边，这里千万要记住大小写，不然前方有坑等着）</p></li>
+<li><p>2.下载github的<a href="https://desktop.github.com">客户端</a></p></li>
+<li><p>3.将刚刚创建的代码仓库，克隆一份到电脑本地
+<img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2xw5d4a4aj20m805omya.jpg" alt="repo2 icon"></p></li>
+<li><p>4.创建一个简单的Hello World静态页面
+&emsp;&emsp;用终端在目录下创建<code>index.html</code>文件，输入文件内容：</p></li>
+</ul>
+<div class="highlight"><pre><code class="language-ojb" data-lang="ojb">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;body&gt;
+&lt;h1&gt;Hello World&lt;/h1&gt;
+&lt;p&gt;I'm hosted with GitHub Pages.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre></div>
+<p><img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2xwi1alwfj208c03fdfv.jpg" alt="repo3 icon"></p>
+
+<ul>
+<li><p>5.将<code>index.html</code>文件上传到github上
+<img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2xwrym2soj21ak0ycgrx.jpg" alt="repo3 icon"></p></li>
+<li><p>6.浏览器输入<code>(你的用户名).github.io</code>，就初步看到效果啦
+<img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2xwmlhawmj20qu0a4wfe.jpg" alt="repo4 icon"></p></li>
+</ul>
+
+<h3>三、Jekyll本地环境搭建（待完善）</h3>
+
+<blockquote>
+<p><a href="http://jekyllcn.com">Jekyll中文指导手册</a></p>
+</blockquote>
+
+<p>&emsp;&emsp;GitHub Pages为了提供对HTML内容的支持，选择了<a href="https://github.com/jekyll/jekyll">Jekyll</a>作为模板系统，Jekyll是一个强大的静态模板系统，作为个人博客使用，基本上可以满足要求，也能保持管理的方便。  </p>
+
+<p>&emsp;&emsp;Jekyll是一种简单的、适用于博客的、静态网站生成引擎。它使用一个模板目录作为网站布局的基础框架，支持Markdown、Textile等标记语言的解析，提供了模板、变量、插件等功能，最终生成一个完整的静态Web站点。说白了就是，只要安装Jekyll的规范和结构，不用写html，就可以生成网站。</p>
+
+<ul>
+<li>Jekyll基本结构</li>
+</ul>
+
+<p>&emsp;&emsp;Jekyll的核心其实就是一个文本的转换引擎，用你最喜欢的标记语言写文档，可以是Markdown、Textile或者HTML等等，再通过layout将文档拼装起来，根据你设置的URL规则来展现，这些都是通过严格的配置文件来定义，最终的产出就是web页面。</p>
+<div class="highlight"><pre><code class="language-" data-lang="">|-- _config.yml
+|-- _includes
+|-- _layouts
+|   |-- default.html
+|    -- post.html
+|-- _posts
+|   |-- 2007-10-29-why-every-programmer-should-play-nethack.textile
+|    -- 2009-04-26-barcamp-boston-4-roundup.textile
+|-- _site
+ -- index.html
+</code></pre></div>
+<ul>
+<li><p>将主题下载到本地<a href="https://github.com/onevcat/vno-jekyll">Vno-Jekyll</a>，解压到刚刚的代码仓库目录下，可以把文件夹里的文件都删了。</p></li>
+<li><p>安装本地<code>Jekyll</code>环境步骤：</p>
+
+<p>1.安装<code>ruby</code>（去百度一下，有很多教程）</p>
+
+<p>2.打开终端，执行<code>sudo gem install jekyll</code>（用vpn比较快点）</p>
+
+<p>如果是在淘宝的镜像，可能找不到<code>Jekyll</code></p>
+<div class="highlight"><pre><code class="language-obj" data-lang="obj">ERROR:  Could not find a valid gem 'jekyll' (&gt;= 0), here is why:
+      Unable to download data from http://ruby.taobao.org/ - bad response Not Found 404 (http://ruby.taobao.org/latest_specs.4.8.gz)
+</code></pre></div>
+<p>更换镜像：<br>
+<code>gem source -r https://ruby.taobao.org/</code>  (移除淘宝镜像)<br>
+<code>gem source -a https://rubygems.org/</code>  (添加新镜像)</p>
+
+<p>查看当前镜像：<code>gem source</code>，出现下面输出代表更换成功</p>
+<div class="highlight"><pre><code class="language-" data-lang="">*** CURRENT SOURCES ***
+https://rubygems.org/
+</code></pre></div>
+<p>再次执行<code>sudo gem install jekyll</code>，输入电脑密码，等待安装一会。</p>
+
+<p>3.进入到你刚刚下载的Jekyll主体文件目录<code>cd /Users/Joe/Documents/git/Joe-Liuyi.github.io</code></p>
+
+<p>4.执行<code>bundle install</code>
+如果出现提示：</p>
+<div class="highlight"><pre><code class="language-" data-lang="">-bash: bundle: command not found
+</code></pre></div>
+<p>就先安装bundle（执行<code>sudo gem install bundle</code>），再执行此命令，见一堆绿色打印的时候说明执行命令成功。</p>
+
+<p>5.开启Jekyll环境<code>bundle exec jekyll serve</code>，看见下面输出代表开启成功。</p>
+<div class="highlight"><pre><code class="language-" data-lang="">liuyideMacBook-Pro:Joe-Liuyi.github.io Joe$ bundle exec jekyll serve
+Configuration file: /Users/Joe/Documents/git/Joe-Liuyi.github.io/_config.yml
+        Source: /Users/Joe/Documents/git/Joe-Liuyi.github.io
+   Destination: /Users/Joe/Documents/git/Joe-Liuyi.github.io/_site
+Incremental build: disabled. Enable with --incremental
+  Generating... 
+                done in 0.528 seconds.
+Auto-regeneration: enabled for '/Users/Joe/Documents/git/Joe-Liuyi.github.io'
+Configuration file: /Users/Joe/Documents/git/Joe-Liuyi.github.io/_config.yml
+Server address: http://127.0.0.1:4000/
+Server running... press ctrl-c to stop.
+</code></pre></div>
+<p>6.在浏览器输入<code>http://127.0.0.1:4000/</code>，即可看见刚刚从网上下载的<code>vno-jekyll</code>主体技术博客了</p>
+
+<p>7.用git电脑终端将这些代码都上传到git代码仓库。浏览器输入<code>(你的用户名).github.io</code>，就可以看到你的成效了。</p></li>
+</ul>
+
+<h3>四、绑定个人域名</h3>
+
+<ul>
+<li><p><strong>1.创建CNAME文件</strong></p>
+
+<blockquote>
+<p>在仓库根目录的<code>master</code>分支上创建文件<code>CNAME</code>，不带后缀。并将不带协议名的裸域名写进去(<code>joe-liu.com</code>，而不是<code>http://joe-liu.com/</code>)<br>
+如果看到绿色打钩，说明配置文件成功了。<br>
+这一步也可以参考<a href="https://help.github.com/articles/setting-up-your-pages-site-repository/">官方文档</a></p>
+</blockquote></li>
+</ul>
+
+<p><img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bgw1f2yidhzl6aj205007njro.jpg" alt="cname1 icon"></p>
+
+<p><img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bgw1f2yidihvu6j20go0bujrz.jpg" alt="cname2 icon"></p>
+
+<p><img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2yj0czpekj20dw02s0sw.jpg" alt="cname3 icon"></p>
+
+<p><img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2yj3rkqgxj20go06xdgn.jpg" alt="cname4 icon"></p>
+
+<p>&emsp;&emsp;&emsp;&emsp;好吧， 你直接在代码仓库里点击<code>New file</code>也很快</p>
+
+<p><img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2yjq1j0k9j20b405t3z5.jpg" alt="cname4 icon"></p>
+
+<ul>
+<li><p><strong>2.购买域名</strong></p>
+
+<blockquote>
+<p>我是在<a href="https://wanwang.aliyun.com">万网</a>上购买的域名，域名不一定要和github用户名一样。</p>
+</blockquote></li>
+<li><p><strong>3.添加A记录</strong></p>
+
+<blockquote>
+<p>购买完，进入<code>管理控制台</code> -&gt; <code>云解析</code> -&gt; <code>解析</code> -&gt; <code>添加解析</code> -&gt; 添加<code>A</code>记录 :<br>
+<code>192.30.252.153</code><br>
+<code>192.30.252.154</code></p>
+</blockquote></li>
+</ul>
+
+<p><img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2yim1c737j21d6068768.jpg" alt="domain icon"></p>
+
+<ul>
+<li><p>4.等待DNS解析生效</p>
+
+<blockquote>
+<p>大概十分钟内吧，奇葩情况可能要0-72小时都有可能。<br>
+可以在终端输入：<code>dig joe-liu.com +nostats +nocomments +nocmd</code>，查看解析生效没。如果看到下面两条记录说明就解析好了。快输入你的域名看看效果吧。</p>
+</blockquote></li>
+</ul>
+<div class="highlight"><pre><code class="language-" data-lang="">liuyideMacBook-Pro:~ Joe$ dig joe-liu.com +nostats +nocomments +nocmd
+; &lt;&lt;&gt;&gt; DiG 9.8.3-P1 &lt;&lt;&gt;&gt; joe-liu.com +nostats +nocomments +nocmd
+;; global options: +cmd
+;joe-liu.com.           IN  A
+joe-liu.com.        355 IN  A   192.30.252.153
+joe-liu.com.        355 IN  A   192.30.252.154
+joe-liu.com.        20  IN  NS  f1g1ns2.dnspod.net.
+joe-liu.com.        20  IN  NS  f1g1ns1.dnspod.net.
+</code></pre></div>
+<h3>五、评论功能设置</h3>
+
+<ol>
+<li>登录<a href="https://disqus.com">Disqus</a>网站注册一个账号（开vpn比较快点）</li>
+<li>点击Setting<code>图标</code>，选择<code>Add disqus to site</code></li>
+<li>点击<code>Start Using Engage</code></li>
+<li>设置自己的Disqus的URL
+<img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2zxj6kl8cj20go0a4756.jpg" alt="disqus icon"></li>
+<li>设置根目录下<code>_config.yml</code>文件的disqus的URL</li>
+</ol>
+<div class="highlight"><pre><code class="language-obj" data-lang="obj"># Comment
+comment:
+    disqus: joeliu
+</code></pre></div>
+<h3>六、主题细节修改</h3>
+
+<p>&emsp;&emsp;一切顺利的话，你讲看到下面这个界面。接下来就将网站信息都改成自己的吧。
+<img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2yk2dvkomj20jg09xmz0.jpg" alt="background icon"></p>
+
+<ul>
+<li><p><strong>1.修改个人信息</strong><br>
+&emsp;&emsp;博客名、描述、跳转链接的修改的主要文件路径是在根目录下的文件：<code>_config.yml</code></p></li>
+<li><p><strong>2.修改背景图片</strong><br>
+&emsp;&emsp;头像和背景存放路径：<code>代码仓库根目录</code>-&gt;<code>assets</code>-&gt;<code>image</code>，直接替换文件就好了，不过要保持文件名一样。
+<img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2yk5epypnj20m807ojsm.jpg" alt="guide icon"></p></li>
+</ul>
+
+<h3>七、写文章</h3>
+
+<ul>
+<li><strong>1.存放文章位置</strong>
+<img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2ydn81e45j212a0jq0wr.jpg" alt="article icon"></li>
+</ul>
+
+<p>&emsp;&emsp;用Jekyll写博客，一篇文章就是一个文件，所有需要发表的文章都要放在<code>_posts</code>文件夹里。文件的命名要按<code>YYYY-MM-DD-文章标题.markdown</code>这种格式来，后缀使用<code>.md</code>也可以。文件名一旦确定下来，就不要轻易更改，因为Jekyll结合的评论功能，会根据文件名去查找这篇文章的评论内容。同一篇文章只是更改了文件名，如下：
+<img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2yecz7lggj20xc0eqq78.jpg" alt="article icon"></p>
+
+<ul>
+<li><strong>2.写文章工具</strong></li>
+</ul>
+
+<p>&emsp;&emsp;推荐用<a href="http://25.io/mou/">Mou</a>吧</p>
+
+<ul>
+<li><strong>3.书写格式</strong></li>
+</ul>
+
+<p>&emsp;&emsp;在文章的开头，我们需要先设置头信息。头信息需要根据<a href="http://yaml.org/">YAML</a>的格式写在两行三虚线之间。</p>
+<div class="highlight"><pre><code class="language-obj" data-lang="obj">---
+layout: post
+title: 这个是标题
+date: 2016-04-16 11:11:11.000000000 +09:00
+tags: Jekyll Github
+---
+</code></pre></div>
+<blockquote>
+<p><code>layout</code>：指文章布局的类型，需要使用指定的模版文件，模版文件放在<code>_layouts</code>目录下，暂时用<code>post.html</code>。<code>page.html</code>模板比<code>post.html</code>模板少了<code>更早的文章</code>和<code>评论模块</code>。有能力的也可以自己写一个文章页面的布局模板文件。<br>
+<code>title</code>：文章的标题。<br>
+<code>date</code>：发布文章的时间。（后面的一串零零零好像不能省）<br>
+<code>tags</code>：标签，一篇文章可以设置多个标签，使用空格分割。   </p>
+</blockquote>
+
+<p>&emsp;&emsp;基本上一篇文章只要用到以上一些信息就可以了，当然还有其它的变量可以设置，具体用法可以在<a href="http://jekyllrb.com/docs/frontmatter/">Jekyll网站</a>上查看。</p>
+
+<p>&emsp;&emsp;终于可以开始写文章了，一劳永逸，以后再也不用关心那些破事了，将心思放在写文章上。</p>
+
+<p>&emsp;&emsp;为了写出漂亮排版的文章，需要多注意下Markdown的语法说明，第一次运行<code>Mou</code>软件的时候，会有弹出使用语法说明，如果不小心关了，也可以在软件的菜单栏里找到 <code>Help -&gt; Mou Help</code> :
+<img src="/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2yfgbcdwej20m80ettby.jpg" alt="mou icon"></p>
+
+<p>&emsp;&emsp;在写文章的时候，在终端执行<code>bundle exec jekyll serve</code>，开启Jekyll本地环境，可以一边写博文，一边刷新<code>http://127.0.0.1:4000/</code>地址查看实时效果。写完提交git，就完事啦。</p>
+
+  </section>
+</article>
+
+<section class="read-more">
+   
+   
+   <div class="read-more-item">
+       <span class="read-more-item-dim">最近的文章</span>
+       <h2 class="post-list__post-title post-title"><a href="/2016/07/%E9%AB%98%E4%BB%BFiOS%E5%BE%AE%E4%BF%A1%E4%BE%A7%E6%BB%91cell%E6%95%88%E6%9E%9C/" title="link to 高仿iOS微信侧滑cell效果">高仿iOS微信侧滑cell效果</a></h2>
+       <p class="excerpt">先展示三张效果图:项目代码  目前，在微信里我能观察到的交互细节，基本都实现了。如果有哪儿效果不对，或者有些细节没有考虑到，还望指出。以下是我观察到以及实现的细节:1.将cell向右推，向右推，移动的距离是被限制的.2.将cell向右推松手之后有一个反弹的动画.3.将cell向左推至极限之后松手，会回弹部分.4.侧滑出来的按钮，有一个，有两个，有自定义的5.当按钮出来后，除了点击按钮操作之外，无论其他什么操作，侧滑按钮都会隐藏起来。比如在松手按钮出来后，1⃣️继续向左滑 2⃣️向右滑 3⃣...&hellip;</p>
+       <div class="post-list__meta"><time datetime="2016-07-13 11:36:11 +0800" class="post-list__meta--date date">2016-07-13</time> &#8226; <span class="post-list__meta--tags tags">WeChat&emsp;iOS&emsp;Cell&emsp;</span><a class="btn-border-small" href=/2016/07/%E9%AB%98%E4%BB%BFiOS%E5%BE%AE%E4%BF%A1%E4%BE%A7%E6%BB%91cell%E6%95%88%E6%9E%9C/>继续阅读</a></div>
+   </div>
+   
+   
+   
+</section>
+
+<section class="post-comments">
+  
+    <div id="disqus_thread"></div>
+    <script>
+    
+    var disqus_config = function () {
+        this.page.url = "http://louisly.com/2016/04/used-jekyll-to-create-my-github-blog/";
+        this.page.identifier = "/2016/04/used-jekyll-to-create-my-github-blog/";
+    };
+
+    var disqus_shortname = 'louis-ly';
+    
+    (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>要查看<a href="http://disqus.com/?ref_noscript"> Disqus </a>评论，请启用 JavaScript</noscript>
+    
+  
+</section>
+
+            <section class="footer">
+    <footer>
+    	<span class="footer__copyright">本站点采用<a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">知识共享 署名-非商业性使用-相同方式共享 4.0 国际 许可协议</a></span>
+        <span class="footer__copyright">由 <a href="https://jekyllrb.com">Jekyll</a> 于 2016-07-15 生成，感谢 <a href="https://www.digitalocean.com/?refcode=30ed2d146762">Digital Ocean</a> 为本站提供稳定的 VPS 服务</span>
+        <span class="footer__copyright">本站由 <a href="http://onev.cat">@onevcat</a> 创建，采用 <a href="https://github.com/onevcat/vno-jekyll">Vno - Jekyll</a> 作为主题，您可以在 GitHub 找到<a href="https://github.com/onevcat/OneV-s-Den">本站源码</a> - &copy; 2016</span>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script type="text/javascript" src="/js/main.js"></script>
+
+
+
+    
+  </body>
+
+</html>

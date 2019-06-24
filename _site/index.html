@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>Louis</title>
+  <meta name="description" content="Louis的iOS开发小站">
+  <meta name="author" content="Wei Wang">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Louis">
+  <meta name="twitter:description" content="Louis的iOS开发小站">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Louis">
+  <meta property="og:description" content="Louis的iOS开发小站">
+  
+  <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
+  <link href="/assets/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://louisly.com/">
+  <link rel="alternate" type="application/rss+xml" title="Louis" href="http://louisly.com/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+  
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">
+        <i class="fa fa-list btn-mobile-menu__icon"></i>
+        <i class="fa fa-angle-up btn-mobile-close__icon hidden"></i>
+    </span>
+    
+    <header class="panel-cover " style="background-image: url('/assets/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <a href="/#blog" title="前往 Louis 的主页" class="blog-button"><img src="/assets/images/avatar.jpg" width="80" alt="Louis logo" class="panel-cover__logo logo" /></a>
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for Louis" class="blog-button">Louis</a></h1>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">Louis的iOS开发小站</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        <p class="panel-cover__description"><a href="https://github.com/louis-ly" target="_blank"></a></p>
+        
+        
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="Visit blog" class="blog-button">Blog</a></li>
+                
+              </ul>
+            </nav>
+          </div>
+          
+          <div><nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+  
+  <!-- Weibo -->
+  <li class="navigation__item">
+    <a href="http://weibo.com/louisCoder" title="@louisCoder 的微博" target="_blank">
+      <i class='social fa fa-weibo'></i>
+      <span class="label">Weibo</span>
+    </a>
+  </li>
+  
+
+  
+  <!-- Github -->
+  <li class="navigation__item">
+    <a href="https://github.com/louis-ly" title="@louis-ly 的 Github" target="_blank">
+      <i class='social fa fa-github'></i>
+      <span class="label">Github</span>
+    </a>
+  </li>
+  
+  
+  
+  <!-- Twitter -->
+  <li class="navigation__item">
+    <a href="http://twitter.com/louisCoder" title="@louisCoder" target="_blank">
+      <i class='social fa fa-twitter'></i>
+      <span class="label">Twitter</span>
+    </a>
+  </li>
+  
+
+  
+  <!-- Google Plus -->
+  <li class="navigation__item">
+    <a href="https://plus.google.com/114566653125205042673" rel="author" title="Google+" target="_blank">
+      <i class='social fa fa-google-plus-square'></i>
+      <span class="label">Google Plus</span>
+    </a>
+  </li>
+  
+
+  <!-- RSS -->
+  <li class="navigation__item">
+    <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+      <i class='social fa fa-rss'></i>
+      <span class="label">RSS</span>
+    </a>
+  </li>
+
+  
+  <!-- Email -->
+  <li class="navigation__item">
+    <a href="mailto:396868934@qq.com" title="Contact me">
+      <i class='social fa fa-envelope'></i>
+      <span class="label">Email</span>
+    </a>
+  </li>
+  
+
+  </ul>
+</nav>
+</div>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-disabled"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <div class="main-post-list hidden">
+
+  <ol class="post-list">
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/07/Periscope%E5%92%8C%E6%98%A0%E5%AE%A2%E7%9B%B4%E6%92%AD%E9%A1%B5%E9%9D%A2%E7%9A%84%E7%BB%BC%E5%90%88%E4%BD%93/" title="访问 Periscope和映客直播页面的综合体">Periscope和映客直播页面的综合体</a></h2>
+      <p class="excerpt">原版Periscope效果图（颜色比较多所以图片比较多，不过效果还不是很好，建议下个Periscope，开个VPN看看）本demo效果图：代码地址实现手势下拉  模态弹出时需要设置下弹出的模式和风格modalPresentationStyle。是为了回头手势下拉漏出上一个控制器的view时是有内容的，而不会是漆黑一片。因为一个控制器切换到另一个控制器时，系统为了节约资源，会将上一个页面暂时从屏幕上移除，需要的时候再加回来。LYLiveViewController *liveVC = [LY...&hellip;</p>
+      <div class="post-list__meta"><time datetime="2016-07-15 21:41:11 +0800" class="post-list__meta--date date">2016-07-15</time> &#8226; <span class="post-list__meta--tags tags">Periscope&emsp;iOS&emsp;映客&emsp;</span><a class="btn-border-small" href=/2016/07/Periscope%E5%92%8C%E6%98%A0%E5%AE%A2%E7%9B%B4%E6%92%AD%E9%A1%B5%E9%9D%A2%E7%9A%84%E7%BB%BC%E5%90%88%E4%BD%93/>继续阅读</a></div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/07/%E9%AB%98%E4%BB%BFiOS%E5%BE%AE%E4%BF%A1%E4%BE%A7%E6%BB%91cell%E6%95%88%E6%9E%9C/" title="访问 高仿iOS微信侧滑cell效果">高仿iOS微信侧滑cell效果</a></h2>
+      <p class="excerpt">先展示三张效果图:项目代码  目前，在微信里我能观察到的交互细节，基本都实现了。如果有哪儿效果不对，或者有些细节没有考虑到，还望指出。以下是我观察到以及实现的细节:1.将cell向右推，向右推，移动的距离是被限制的.2.将cell向右推松手之后有一个反弹的动画.3.将cell向左推至极限之后松手，会回弹部分.4.侧滑出来的按钮，有一个，有两个，有自定义的5.当按钮出来后，除了点击按钮操作之外，无论其他什么操作，侧滑按钮都会隐藏起来。比如在松手按钮出来后，1⃣️继续向左滑 2⃣️向右滑 3⃣...&hellip;</p>
+      <div class="post-list__meta"><time datetime="2016-07-13 11:36:11 +0800" class="post-list__meta--date date">2016-07-13</time> &#8226; <span class="post-list__meta--tags tags">WeChat&emsp;iOS&emsp;Cell&emsp;</span><a class="btn-border-small" href=/2016/07/%E9%AB%98%E4%BB%BFiOS%E5%BE%AE%E4%BF%A1%E4%BE%A7%E6%BB%91cell%E6%95%88%E6%9E%9C/>继续阅读</a></div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/04/used-jekyll-to-create-my-github-blog/" title="访问 用Jekyll搭建的Github Pages个人博客">用Jekyll搭建的Github Pages个人博客</a></h2>
+      <p class="excerpt">&emsp;&emsp;近半年一直忙于项目开发，不烙得空。近期慢慢清闲了，终于有机会可以写写属于自己的技术博客。&emsp;&emsp;之前有打算在CSDN、cnblogs等博客平台上写的，不过个人觉得界面设计、页面效果比较low，不符合我的审美观&lt;(￣▽￣)&gt;。也有考虑过在简书上面写，因为界面看着简约大方上档次的赶脚，平时也看到挺多简书里的技术文章。不过，简书首页写着“一个基于内容分析的社区”，也就是啥啥啥文章都有，不只是技术博客，额，给我感觉在上面写自己的技术博客不是很正宗...&hellip;</p>
+      <div class="post-list__meta"><time datetime="2016-04-16 10:11:11 +0800" class="post-list__meta--date date">2016-04-16</time> &#8226; <span class="post-list__meta--tags tags">Jekyll&emsp;Github</span><a class="btn-border-small" href=/2016/04/used-jekyll-to-create-my-github-blog/>继续阅读</a></div>
+      <hr class="post-list__divider" />
+    </li>
+    
+  </ol>
+
+  <hr class="post-list__divider " />
+
+<nav class="pagination" role="navigation">
+    
+    <span class="pagination__page-number">1 / 1</span>
+    
+</nav>
+
+
+</div>
+
+            <section class="footer">
+    <footer>
+    	<span class="footer__copyright">本站点采用<a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">知识共享 署名-非商业性使用-相同方式共享 4.0 国际 许可协议</a></span>
+        <span class="footer__copyright">由 <a href="https://jekyllrb.com">Jekyll</a> 于 2016-07-15 生成，感谢 <a href="https://www.digitalocean.com/?refcode=30ed2d146762">Digital Ocean</a> 为本站提供稳定的 VPS 服务</span>
+        <span class="footer__copyright">本站由 <a href="http://onev.cat">@onevcat</a> 创建，采用 <a href="https://github.com/onevcat/vno-jekyll">Vno - Jekyll</a> 作为主题，您可以在 GitHub 找到<a href="https://github.com/onevcat/OneV-s-Den">本站源码</a> - &copy; 2016</span>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script type="text/javascript" src="/js/main.js"></script>
+
+
+
+    
+  </body>
+
+</html>

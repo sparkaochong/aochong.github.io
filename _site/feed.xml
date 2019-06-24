@@ -1,0 +1,727 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Louis</title>
+    <description>Louis的iOS开发小站</description>
+    <link>http://louisly.com/</link>
+    <atom:link href="http://louisly.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Fri, 15 Jul 2016 22:59:44 +0800</pubDate>
+    <lastBuildDate>Fri, 15 Jul 2016 22:59:44 +0800</lastBuildDate>
+    <generator>Jekyll v3.1.1</generator>
+    
+      <item>
+        <title>Periscope和映客直播页面的综合体</title>
+        <description>&lt;p&gt;原版Periscope效果图&lt;br&gt;
+（颜色比较多所以图片比较多，不过效果还不是很好，建议下个&lt;a href=&quot;https://itunes.apple.com/cn/app/periscope/id972909677?mt=8&quot;&gt;Periscope&lt;/a&gt;，开个VPN看看）&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-7c2d8fbb26bf3d12.gif?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;本demo效果图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-7147f233e22ada1d.gif?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/louis-ly/LYPeriscope&quot;&gt;代码地址&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3&gt;实现&lt;/h3&gt;
+
+&lt;h5&gt;手势下拉&lt;/h5&gt;
+
+&lt;p&gt;  模态弹出时需要设置下弹出的模式和风格&lt;code&gt;modalPresentationStyle&lt;/code&gt;。是为了回头手势下拉漏出上一个控制器的view时是有内容的，而不会是漆黑一片。因为一个控制器切换到另一个控制器时，系统为了节约资源，会将上一个页面暂时从屏幕上移除，需要的时候再加回来。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;LYLiveViewController *liveVC = [LYLiveViewController new];
+liveVC.modalPresentationStyle = UIModalPresentationCustom;
+[self presentViewController:liveVC animated:YES completion:nil];
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  那么手势是添加在控制器的view上面吗？如果你观察上面gif，你会发现，在视图下拉的过程中，后面有一层黑色的遮住，松手控制器消失的过程黑色是会有渐变成透明的过程的。所有手势应该加在自定义的view上，回头所以的视图都加在这个创建的view上面。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0.7];
+
+    _containView = [UIView new];
+    _containView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
+    [_containView addSubview:self.looseCloseTipView];
+    [self.view addSubview:_containView];
+
+    _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
+    _panGesture.delegate = self;
+    [_containView addGestureRecognizer:_panGesture];
+}
+
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    _containView.frame = self.view.bounds;
+}
+
+- (void)handlePanGesture:(UIPanGestureRecognizer *)panGesture {
+    CGPoint movePoint = [panGesture translationInView:panGesture.view];
+    [panGesture setTranslation:CGPointZero inView:panGesture.view];
+
+    if (panGesture.state == UIGestureRecognizerStateBegan) {
+
+    } else if (panGesture.state == UIGestureRecognizerStateChanged) {
+        _containView.y += movePoint.y / 2.5;
+        self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0.7];
+
+        if (_containView.y &amp;gt; 64 &amp;amp;&amp;amp; _looseCloseTipView.alpha == 0) {
+            [UIView animateWithDuration:0.3 animations:^{
+                _looseCloseTipView.alpha = 1;
+            }];
+        } else if (_containView.y &amp;lt; 64 &amp;amp;&amp;amp; _looseCloseTipView.alpha == 1) {
+            [UIView animateWithDuration:0.3 animations:^{
+                _looseCloseTipView.alpha = 0;
+            }];
+        } else if (_containView.y &amp;lt; 0) {
+            self.view.backgroundColor = [UIColor blackColor];
+        }
+    } else if (panGesture.state == UIGestureRecognizerStateEnded) {
+        if (_containView.y &amp;lt; 0) {
+            [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                _containView.y = 0;
+            } completion:^(BOOL finished) {
+
+            }];
+        } else if (_containView.y &amp;gt; 64) {
+            [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                _containView.y = _containView.height;
+                self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0];
+            } completion:^(BOOL finished) {
+                [self dismissViewControllerAnimated:NO completion:nil];
+            }];
+        } else if (_containView.y &amp;lt; 64) {
+            [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                _containView.y = 0;
+                self.view.backgroundColor = [UIColor colorWithWhite:0 0.7];
+            } completion:^(BOOL finished) {
+
+            }];
+        }
+    }
+}
+
+- (UIView *)looseCloseTipView {
+    if (!_looseCloseTipView) {
+        CGFloat screenWidth =[UIScreen mainScreen].bounds.size.width;
+        _looseCloseTipView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenWidth, 40)];
+        _looseCloseTipView.alpha = 0;
+
+        CAGradientLayer *gradient = [CAGradientLayer layer];
+        gradient.frame = CGRectMake(0, 0, screenWidth, 40);
+        gradient.colors = @[(__bridge id)[UIColor colorWithWhite:0 alpha:0.5].CGColor,
+                            (__bridge id)[UIColor colorWithWhite:0 alpha:0.2].CGColor,
+                            (__bridge id)[UIColor colorWithWhite:0 alpha:0].CGColor];
+        [_looseCloseTipView.layer addSublayer:gradient];
+
+        UILabel *label = [[UILabel alloc] initWithFrame:_looseCloseTipView.bounds];
+        NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:@&quot;松开以关闭&quot;];
+        [attrString addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:12.0] range:NSMakeRange(0, 3)];
+        [attrString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:12] range:NSMakeRange(3, 2)];
+        [attrString addAttribute:NSForegroundColorAttributeName value:[UIColor whiteColor] range:NSMakeRange(0, attrString.length)];
+        label.attributedText = attrString;
+        label.textAlignment = 1;
+        [_looseCloseTipView addSubview:label];
+    }
+    return _looseCloseTipView;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-563d80e09e55aae0.gif?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;  手势移动多少，视图并没有跟着移动多少，所以我这边将移动的距离除以2.5，&lt;code&gt;_containView.y += movePoint.y / 2.5;&lt;/code&gt;
+  如果手势是上拉，则漏出来的是全黑色的，所以在&lt;code&gt;_containView.y &amp;lt; 0&lt;/code&gt;控制器的view就设置为黑色。&lt;/p&gt;
+
+&lt;h5&gt;加载动画&lt;/h5&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-5fd0ad3f336205b2.gif?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;  这个一条一条的图，其实只是由一个小图片填充而成的。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-5b5cb7013fff8d6f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;CGFloat screenWidth =[UIScreen mainScreen].bounds.size.width;
+_loadingView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenWidth * 2, 221)];
+_loadingView.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@&quot;loading_pattern_video&quot;]];
+_loadingView.layer.anchorPoint = CGPointMake(0, 0);
+[_containView addSubview:_loadingView];
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  动画的过程，其实只是图片向做移动的过程而已。不断的重复动画即可。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@&quot;position&quot;];
+animation.repeatCount = MAXFLOAT;
+animation.duration = 5;
+animation.delegate = self;
+animation.removedOnCompletion = YES;
+animation.fillMode = kCAFillModeForwards;
+animation.values = @[[NSValue valueWithCGPoint:CGPointMake(0, 0)],
+                     [NSValue valueWithCGPoint:CGPointMake(-screenWidth, 0)]];
+[_loadingView.layer addAnimation:animation forKey:@&quot;animation&quot;];
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h5&gt;添加scrollView&lt;/h5&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;- (UIScrollView *)scrollView {
+    if (!_scrollView) {
+        _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight)];
+        _scrollView.contentSize = CGSizeMake(kScreenWidth * 2, 0);
+        _scrollView.pagingEnabled = YES;
+        _scrollView.showsHorizontalScrollIndicator = NO;
+        _scrollView.contentOffset = CGPointMake(kScreenWidth, 0);
+        
+        LYLiveDetailViewController *detailVC = [LYLiveDetailViewController new];
+        detailVC.view.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight);
+        [self addChildViewController:detailVC];
+        [_scrollView addSubview:detailVC.view];
+        
+        LYLiveChatViewController *_chatVC = [LYLiveChatViewController new];
+        _chatVC.view.frame = CGRectMake(kScreenWidth, 0, kScreenWidth, kScreenHeight);
+        [self addChildViewController:_chatVC];
+        [_scrollView addSubview:_chatVC.view];
+    }
+    return _scrollView;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  scrollView上面添加两个控制器&lt;code&gt;LYLiveDetailViewController&lt;/code&gt;和&lt;code&gt;LYLiveChatViewController&lt;/code&gt;，将代码分开管理。&lt;code&gt;LYLiveDetailViewController&lt;/code&gt;是管理直播间的详情和直播观众的列表，&lt;code&gt;LYLiveChatViewController&lt;/code&gt;是聊天室的一些东西，比如送礼物、点赞动画、发送聊天上面的。&lt;/p&gt;
+
+&lt;h5&gt;实现LYLiveDetailViewController内容&lt;/h5&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-fe7633f4b5ade0e1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;  当tableView在滚动的时候，上面的&lt;code&gt;‘English Chap On Hong Kong Radio！’&lt;/code&gt;视图会跟着移动，本文是通过tableView的&lt;code&gt;scrollViewDidScroll:&lt;/code&gt;代理，实时的改变它的坐标，来实现粘合的感觉。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;#define LYLiveDetailTitleViewHeight 60
+#define LYLiveDetailTableY 128
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    CGFloat contentOffsetY = scrollView.contentOffset.y;
+    _titleView.y = (contentOffsetY &amp;lt; 0 ? -contentOffsetY : 0) + LYLiveDetailTableY - LYLiveDetailTitleViewHeight;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  此时效果已经基本实现了，如下图：
+  
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-2db20e49c9c8f180.gif?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;  但是会遇到一个问题，当tableView已经滚到下面的时候，想滑动contentInset.Top区域想实现让整个控制器都下移，来实现退出直播的效果，却被tableView给接收了，之前的pan手势没有被激活。那么怎么办？那么只要当tableView滚至底部的时候，点击contentInset.Top的区域tableView不要接收touch就好了，所以咱们要自定义tableView，实现hitTest:withEvent:方法来进行判断。代码量很少，但是却实现了需要的效果，代码如下：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;&lt;span class=&quot;k&quot;&gt;@interface&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;LYLiveDetailTableView&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;UITableView&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;@end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;@implementation&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;LYLiveDetailTableView&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;UIView&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;hitTest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CGPoint&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;point&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;withEvent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;UIEvent&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;event&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;point&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;nil&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;super&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;hitTest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;point&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;withEvent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;@end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-7cb09bde557178a6.gif?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;  早一些假数据后得到下面效果：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-98d0b22e7e01b656.gif?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;  上面&lt;code&gt;直播观众&lt;/code&gt;的视图有悬浮的效果，并不是通过&lt;code&gt;headerSection&lt;/code&gt;来实现的，而是重新创建的视图，在&lt;code&gt;scrollViewDidScroll:&lt;/code&gt;方法中控制&lt;code&gt;hidden&lt;/code&gt;属性。&lt;/p&gt;
+
+&lt;h5&gt;实现LYLiveChatViewController内容&lt;/h5&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-a1d915465744c3dd.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;  这个页面的难点不是很多，都是一些交互的细节，也没啥子好说的了。不过可以说下控制送礼物在屏幕上的数量，观察发现映客上面不管多少个人送礼物，始终只有两个礼物在上面显示。
+  本demo给到的方案是，当收到礼物消息的时候，不是马上做显示到屏幕上的操作，而是先存到一个数组里面。
+  再创建一个定时器，定时去判断两个礼物位置是否正在做动画，如果没有，则从刚刚存礼物消息的数组中取出最先存进去的&lt;code&gt;firstObject&lt;/code&gt;礼物消息，做动画操作。
+  具体代码看工程里&lt;code&gt;LYLiveGiftBarrage&lt;/code&gt;和&lt;code&gt;LYLiveGiftBarrageView&lt;/code&gt;文件。&lt;/p&gt;
+
+&lt;h4&gt;END&lt;/h4&gt;
+
+&lt;p&gt;  想讲的说的差不多了，如果有不理解或者更好的建议欢迎评论里沟通。&lt;/p&gt;
+</description>
+        <pubDate>Fri, 15 Jul 2016 21:41:11 +0800</pubDate>
+        <link>http://louisly.com/2016/07/Periscope%E5%92%8C%E6%98%A0%E5%AE%A2%E7%9B%B4%E6%92%AD%E9%A1%B5%E9%9D%A2%E7%9A%84%E7%BB%BC%E5%90%88%E4%BD%93/</link>
+        <guid isPermaLink="true">http://louisly.com/2016/07/Periscope%E5%92%8C%E6%98%A0%E5%AE%A2%E7%9B%B4%E6%92%AD%E9%A1%B5%E9%9D%A2%E7%9A%84%E7%BB%BC%E5%90%88%E4%BD%93/</guid>
+        
+        <category>Periscope&amp;emsp;iOS&amp;emsp;映客&amp;emsp;</category>
+        
+        
+        <category>iOS</category>
+        
+      </item>
+    
+      <item>
+        <title>高仿iOS微信侧滑cell效果</title>
+        <description>&lt;p&gt;先展示三张效果图:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-65eed5f2b1dae21b.gif?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-97d1c995d7fff48a.gif?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-f7d72aa1ffe5fbaa.gif?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/louis-ly/LYSideslipCell&quot;&gt;项目代码&lt;/a&gt;&lt;br&gt;
+  目前，在微信里我能观察到的交互细节，基本都实现了。如果有哪儿效果不对，或者有些细节没有考虑到，还望指出。&lt;/p&gt;
+
+&lt;h4&gt;以下是我观察到以及实现的细节:&lt;/h4&gt;
+
+&lt;p&gt;1.将cell向右推，向右推，移动的距离是被限制的.&lt;br&gt;
+2.将cell向右推松手之后有一个反弹的动画.
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-ac9813c251e70b2b.gif?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;3.将cell向左推至极限之后松手，会回弹部分.
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-52f6837022a04a5c.gif?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;4.侧滑出来的按钮，有一个，有两个，有自定义的
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-02a3972e71d1d01e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;&quot;&gt;
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-0cd9efc45568fe0c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;&quot;&gt;
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-bf027c52f696a0aa.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;5.当按钮出来后，除了点击按钮操作之外，无论其他什么操作，侧滑按钮都会隐藏起来。比如在松手按钮出来后，&lt;br&gt;
+1⃣️继续向左滑 &lt;br&gt;
+2⃣️向右滑 &lt;br&gt;
+3⃣️滑动其他cell &lt;br&gt;
+4⃣️滑动tableView     
+5⃣️点击任何个cell。 都是会触发隐藏动画.&lt;br&gt;
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-33daa934dbfcc028.gif?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;h3&gt;实现&lt;/h3&gt;
+
+&lt;p&gt;  那么该注意的都列好之后，接下来就一步一步实现。&lt;/p&gt;
+
+&lt;h4&gt;1.实现cell能滑动&lt;/h4&gt;
+
+&lt;p&gt;  首先让cell能侧滑先，那是用&lt;code&gt;scrollView&lt;/code&gt;还是&lt;code&gt;pan移动手势&lt;/code&gt;来实现呢? &lt;br&gt;
+  下面动画图是系统自带的侧滑效果，当你很用力向左边甩的时候，是有弹性动画，滑动的速度不同，反弹的距离也不同。然而你再回去看微信上面，无论你多么用力向左边甩，当你手抬起来的一瞬间，cell都是按照固定的速度在做移动。所以从这可以得出结论，微信是用手势来实现的侧滑.
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-180be7bb6a7b467a.gif?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;  那么手势是添加在self上，还是contentView上还是自定义视图？本文项目是自定义了视图，因为第六感告诉我，加在self或者contentView上也许可以实现效果，不过目测可能将会是一条崎岖的道路。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
+        [self setupSideslipCell];
+    }
+    return self;
+}
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super initWithCoder:aDecoder]) {
+        [self setupSideslipCell];
+    }
+    return self;
+}
+- (void)setupSideslipCell {
+    _containView = [UIView new];
+    _containView.backgroundColor = [UIColor lightGrayColor];  
+    NSArray *cellSubViews = self.subviews;
+    [self insertSubview:_containView atIndex:0];
+    for (UIView *subView in cellSubViews) {
+        [_containView addSubview:subView];
+    }
+    _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(containViewPan:)];
+    _panGesture.delegate = self;
+    [_containView addGestureRecognizer:_panGesture];
+}
+- (void)containViewPan:(UIPanGestureRecognizer *)pan {
+    NSLog(@&quot;containViewPan&quot;);
+}
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    _containView.frame = self.bounds;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  重写&lt;code&gt;initWithStyle:reuseIdentifier:&lt;/code&gt;和&lt;code&gt;initWithCoder:&lt;/code&gt;方法，再统一调用&lt;code&gt;setupSideslipCell&lt;/code&gt;是因为，使用我们写的cell的开发者，可能是用代码创建cell，也可能用xib、storyboard来创建。那么&lt;code&gt;initWithStyle:reuseIdentifier:&lt;/code&gt;这个方法代码创建之后必须会调用，而&lt;code&gt;initWithCoder:&lt;/code&gt;是非代码创建cell时会调用的。（好吧，说的有点初级了）
+  接下来创建个&lt;code&gt;_containView&lt;/code&gt;视图用来容纳cell上的所有视图，遍历cell目前的所有子视图都添加到&lt;code&gt;_containView&lt;/code&gt;上，再添加&lt;code&gt;_panGesture&lt;/code&gt;手势，移动&lt;code&gt;_containView&lt;/code&gt;时，所有的内容跟着移动。
+  但是加完手势，你会发现上下左右的手势事件都被cell的获取了，使得tableView上下滚不了，一动不动。解决的方式就是实现手势代理方法&lt;code&gt;gestureRecognizerShouldBegin:&lt;/code&gt;，做手势是否接收的判断.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer == _panGesture) {
+        UIPanGestureRecognizer *gesture = (UIPanGestureRecognizer *)gestureRecognizer;
+        CGPoint translation = [gesture translationInView:gesture.view];
+        return fabs(translation.y) &amp;lt;= fabs(translation.x);
+    }
+    return YES;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  &lt;code&gt;fabs&lt;/code&gt;是去绝对值，&lt;code&gt;fabs(translation.y) &amp;lt;= fabs(translation.x)&lt;/code&gt;用来判断，手势是上下滑，还是左右滑。如果是上下滑，就&lt;code&gt;return NO;&lt;/code&gt;不激活cell的pan手势，tableView就可以拿到移动事件了。&lt;/p&gt;
+
+&lt;p&gt;  接着实现手势方法&lt;code&gt;containViewPan&lt;/code&gt;，让cell动起来吧！&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;- (void)containViewPan:(UIPanGestureRecognizer *)pan {
+    CGPoint point = [pan translationInView:pan.view];
+    [pan setTranslation:CGPointZero inView:pan.view];
+    CGRect frame = _containView.frame;
+    frame.origin.x += point.x;
+    _containView.frame = frame;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1812927-9ad173c7a888333d.gif?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;h4&gt;2.侧滑按钮的出现于消失&lt;/h4&gt;
+
+&lt;p&gt;  跟着应该要说创建侧面出现的侧滑按钮了。这边说起来有点复杂，我是用的autolayout约束来实现的控制侧滑按钮的宽。建议看下代码，不懂autolayout的先去补补知识。&lt;br&gt;
+  侧滑按钮主要是用了&lt;code&gt;_sideslipContainView&lt;/code&gt;和&lt;code&gt;_sideslipView&lt;/code&gt;视图。&lt;code&gt;_sideslipView&lt;/code&gt;是加在&lt;code&gt;_sideslipContainView&lt;/code&gt;上面的。&lt;code&gt;_sideslipView&lt;/code&gt;的右边是紧贴&lt;code&gt;_sideslipContainView&lt;/code&gt;的右边。&lt;code&gt;_sideslipView&lt;/code&gt;是用来容纳侧滑按钮，&lt;code&gt;_sideslipView&lt;/code&gt;的宽度是由里面按钮数量、按钮的宽度决定的，&lt;code&gt;_sideslipContainView&lt;/code&gt;的右边是紧贴cell的右边，其中最重要的是&lt;code&gt;_sideslipContainView&lt;/code&gt;的左边是紧贴着&lt;code&gt;_containView&lt;/code&gt;的右边，所以当&lt;code&gt;_containView&lt;/code&gt;没有侧滑的时候，它的右边也是紧贴着cell右边的，&lt;code&gt;_sideslipContainView&lt;/code&gt;受左右约束的挤压而使得宽度为0，就看不见了。随着&lt;code&gt;_containView&lt;/code&gt;因手势而像左移的时候，&lt;code&gt;_sideslipContainView&lt;/code&gt;的宽度就变大，里面的子视图&lt;code&gt;_sideslipView&lt;/code&gt;也就漏出来了。（这段文字显得有点惨白无力，图文又不好去创造，靠自己理解啦。如果你考虑用frame来实现，当然也是可以的，就自行发挥撒。）&lt;/p&gt;
+
+&lt;h4&gt;3.滑动范围限制&lt;/h4&gt;
+
+&lt;p&gt;  下面做他的滑动范围限制。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;#define LYSideslipCellLeftLimitScrollMargin 15
+#define LYSideslipCellRightLimitScrollMargin 30
+if (pan.state == UIGestureRecognizerStateChanged) {
+    CGRect frame = _containView.frame;
+    if (frame.origin.x &amp;gt; LYSideslipCellLeftLimitScrollMargin) {
+        frame.origin.x = LYSideslipCellLeftLimitScrollMargin;
+    } else if (frame.origin.x &amp;lt; -LYSideslipCellRightLimitScrollMargin - CGRectGetWidth(_sideslipView.frame)) {
+        frame.origin.x = -LYSideslipCellRightLimitScrollMargin - CGRectGetWidth(_sideslipView.frame);
+    }
+    _containView.frame = frame;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  &lt;code&gt;LYSideslipCellLeftLimitScrollMargin&lt;/code&gt;是左边能移动的最大距离，&lt;code&gt;LYSideslipCellRightLimitScrollMargin&lt;/code&gt;是右边侧滑按钮出来后再接着能移动的最大距离。&lt;code&gt;CGRectGetWidth(_sideslipView.frame)&lt;/code&gt;获取按钮的总宽度。&lt;/p&gt;
+
+&lt;h4&gt;4.手势结束之后的判断&lt;/h4&gt;
+
+&lt;p&gt;  限制移动范围之后，在&lt;code&gt;pan.state == UIGestureRecognizerStateEnded&lt;/code&gt;手势状态结束的时候判断，此时是什么状态，应该做什么样的操作及动画，动画实现都比较简单。&lt;br&gt;
+  反弹动画就是动画之后再一个反方向动画，代码如下：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;_containLeftConstraint.constant = _sideslipLeftConstraint.constant = -10;
+[UIView animateWithDuration:0.25 delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
+    [self layoutIfNeeded];
+} completion:^(BOOL finished) {
+    _containLeftConstraint.constant = _sideslipLeftConstraint.constant = 0;
+    [UIView animateWithDuration:0.2 delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
+        [self layoutIfNeeded];
+    } completion:^(BOOL finished) {
+    }];
+}];
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  要注意cell如果向右移动的距离不是很大的话，微信是没有反弹动画的。而且在动画的过程中，所有的cell，tableView上面的交互都是关闭不处理的。&lt;br&gt;
+  还有个细节可能也要在意一下，如果在做手势侧滑按钮漏出一半的过程中，突然电话或者其他事件打断之后，手势状态不一定传&lt;code&gt;UIGestureRecognizerStateEnded&lt;/code&gt;，也可能是&lt;code&gt;UIGestureRecognizerStateCancelled&lt;/code&gt;或其他状态，也要做相应的处理判断。&lt;/p&gt;
+
+&lt;h4&gt;5.侧滑按钮显示后的处理&lt;/h4&gt;
+
+&lt;h6&gt;1⃣️当按钮显示出来的动画&lt;/h6&gt;
+
+&lt;p&gt;  一旦触发的时候，就应该让所有cell以及tableView的交互关闭&lt;code&gt;[self closeAllOperation];&lt;/code&gt;。动画结束后再开启交互&lt;code&gt;cell.userInteractionEnabled = YES;&lt;/code&gt;，以便接收pan手势。   &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;- (void)showSideslipButton {
+    [self closeAllOperation];
+    _containLeftConstraint.constant = _sideslipLeftConstraint.constant = -CGRectGetWidth(_sideslipView.frame);
+    [UIView animateWithDuration:0.2 delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
+        [self layoutIfNeeded];
+    } completion:^(BOOL finished) {
+        for (LYSideslipCell *cell in self.tableView.visibleCells)
+            if ([cell isKindOfClass:LYSideslipCell.class]) {
+                cell.userInteractionEnabled = YES;
+            }
+    }];
+}
+- (void)closeAllOperation {
+    self.tableView.scrollEnabled = NO;
+    self.tableView.allowsSelection = NO;
+    for (LYSideslipCell *cell in self.tableView.visibleCells)
+        if ([cell isKindOfClass:LYSideslipCell.class]) {
+            cell.sideslip = YES;
+            cell.tapGesture.enabled = YES;
+            cell.userInteractionEnabled = NO;
+        }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  在自定义cell中获取tableView的方法：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;- (UITableView *)tableView {
+    if (!_tableView) {
+        id view = self.superview;
+        while (view &amp;amp;&amp;amp; [view isKindOfClass:[UITableView class]] == NO) {
+            view = [view superview];
+        }
+        _tableView = (UITableView *)view;
+    }
+    return _tableView;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h6&gt;2⃣️继续向左滑&amp;amp;向右滑&amp;amp;滑动其他cell&lt;/h6&gt;
+
+&lt;p&gt;  侧滑按钮出来后，此时应该添加一个BOOL值sideslip，用来记录当前是否侧滑按钮是显示状态。且要遍历tableView可视的所有cell，将这个值都设为YES。所以一旦pan手势触发的时候，在&lt;code&gt;pan.state == UIGestureRecognizerStateBegan&lt;/code&gt;的时候，判断如果&lt;code&gt;sideslip&lt;/code&gt;为YES，如果是再判断手势是在侧滑按钮显示的cell上还是不在当前手势的cell上。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;if (_containLeftConstraint.constant == 0) {
+        for (LYSideslipCell *cell in self.tableView.visibleCells)
+            if ([cell isKindOfClass:LYSideslipCell.class])
+                [cell hiddenSideslipButton];
+    } else {
+        [self hiddenSideslipButton];
+    }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  如果手势在当前cell上，那么直接调用隐藏动画。如果不在，则遍历可视cell都调用隐藏动画。为防止没有显示出侧滑按钮的cell做动画，所以在&lt;code&gt;[self hiddenSideslipButton];&lt;/code&gt;方法里做判断&lt;code&gt;if (_containLeftConstraint.constant == 0) return;&lt;/code&gt;&lt;/p&gt;
+
+&lt;h6&gt;4⃣️滑动tableView&lt;/h6&gt;
+
+&lt;p&gt;  要使滑动tableView，就触发隐藏动画，简单的方式就是将&lt;code&gt;self.tableView.scrollEnabled = NO;&lt;/code&gt;，另外在cell的pan手势代理里判断加上一句&lt;code&gt;if (!self.tableView.scrollEnabled) return YES;&lt;/code&gt;，如果tableView不能滚动，cell的pan上下滑的手势也可以触发。所以把这事就扔给pan手势吧。不然还需要在内部设置&lt;code&gt;tableView.contentOffset&lt;/code&gt;的&lt;code&gt;observer&lt;/code&gt;，怪麻烦。&lt;/p&gt;
+
+&lt;h6&gt;5⃣️点击任何个cell&lt;/h6&gt;
+
+&lt;p&gt;  在初始化cell的时候，就添加个tap手势，平时&lt;code&gt;enabled = NO;&lt;/code&gt;不让使用。侧滑按钮出来后再设为YES。&lt;/p&gt;
+
+&lt;h3&gt;END&lt;/h3&gt;
+
+&lt;p&gt;  自此，比较重要的点都说的差不多了。有什么疑问或建议欢迎评论里与我交流。&lt;/p&gt;
+</description>
+        <pubDate>Wed, 13 Jul 2016 11:36:11 +0800</pubDate>
+        <link>http://louisly.com/2016/07/%E9%AB%98%E4%BB%BFiOS%E5%BE%AE%E4%BF%A1%E4%BE%A7%E6%BB%91cell%E6%95%88%E6%9E%9C/</link>
+        <guid isPermaLink="true">http://louisly.com/2016/07/%E9%AB%98%E4%BB%BFiOS%E5%BE%AE%E4%BF%A1%E4%BE%A7%E6%BB%91cell%E6%95%88%E6%9E%9C/</guid>
+        
+        <category>WeChat&amp;emsp;iOS&amp;emsp;Cell&amp;emsp;</category>
+        
+        
+        <category>iOS</category>
+        
+      </item>
+    
+      <item>
+        <title>用Jekyll搭建的Github Pages个人博客</title>
+        <description>&lt;p&gt;&amp;emsp;&amp;emsp;近半年一直忙于项目开发，不烙得空。近期慢慢清闲了，终于有机会可以写写属于自己的技术博客。&lt;/p&gt;
+
+&lt;p&gt;&amp;emsp;&amp;emsp;之前有打算在&lt;a href=&quot;http://blog.csdn.net&quot;&gt;CSDN&lt;/a&gt;、&lt;a href=&quot;http://www.cnblogs.com&quot;&gt;cnblogs&lt;/a&gt;等博客平台上写的，不过个人觉得界面设计、页面效果比较low，不符合我的审美观&amp;lt;(￣▽￣)&amp;gt;。也有考虑过在&lt;a href=&quot;http://www.jianshu.com&quot;&gt;简书&lt;/a&gt;上面写，因为界面看着简约大方上档次的赶脚，平时也看到挺多简书里的技术文章。不过，简书首页写着“一个基于内容分析的社区”，也就是啥啥啥文章都有，不只是技术博客，额，给我感觉在上面写自己的技术博客不是很正宗（&lt;del&gt;No zuo，No die&lt;/del&gt;）。依稀记得之前访问&lt;a href=&quot;http://onevcat.com&quot;&gt;喵神&lt;/a&gt;的博客很有feel，如果能做一个他这样的个人博客网站就好了，于是就有了不拉不拉不拉的一通乱逛、乱转、乱撞，终于整出属于&lt;a href=&quot;http://joe-liu.com&quot;&gt;自己的博客&lt;/a&gt;了，不过在这里要感谢喵神git上的提供的主题&lt;a href=&quot;https://github.com/onevcat/vno-jekyll&quot;&gt;Vno-Jekyll&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;&amp;emsp;&amp;emsp;好了，其他废话不多说，下面就说一下搭建过程，然后你也可以拥有和我一模一样的博客了。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;达到效果&lt;/strong&gt;：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;1.自定义域名访问技术博客（joe-liu.com）&lt;/li&gt;
+&lt;li&gt;2.Github二级域名访问博客（joe-liu.github.io）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;一、Github Pages&lt;/h3&gt;
+
+&lt;p&gt;&amp;emsp;&amp;emsp;GitHub Pages 可以为你或者你的项目提供介绍网页，它是由 GitHub 官方托管和发布的。你可以使用 GitHub 提供的页面自动生成器。也可以做个人博客，是个轻量级的博客系统，没有麻烦的配置。使用标记语言如Markdown，不需自己搭建服务器，还可以绑定自己的域名。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;https://help.github.com/categories/github-pages-basics/&quot;&gt;Github Pages - 官方配置指南&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;https://help.github.com/categories/customizing-github-pages/&quot;&gt;Github Pages - 自定义页面指南&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;http://wiki.jikexueyuan.com/project/github-pages-basics/&quot;&gt;极客学院翻译 - 中文版本指南&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3&gt;二、Github二级域名创建&lt;/h3&gt;
+
+&lt;p&gt;&amp;emsp;&amp;emsp;这个步骤比较简单，&lt;a href=&quot;https://pages.github.com&quot;&gt;Github Pages&lt;/a&gt;官网首页就有图文说明。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;1.打开创建代码仓库页面
+&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2xvg9vqjfj214w0v0dmt.jpg&quot; alt=&quot;repo1 icon&quot;&gt;
+&amp;emsp;&amp;emsp;在红框的位置输入-&amp;gt;&lt;code&gt;(你的用户名).github.io&lt;/code&gt;  点击&lt;code&gt;Create repository&lt;/code&gt;。（用户名就是红框左边，这里千万要记住大小写，不然前方有坑等着）&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;2.下载github的&lt;a href=&quot;https://desktop.github.com&quot;&gt;客户端&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;3.将刚刚创建的代码仓库，克隆一份到电脑本地
+&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2xw5d4a4aj20m805omya.jpg&quot; alt=&quot;repo2 icon&quot;&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;4.创建一个简单的Hello World静态页面
+&amp;emsp;&amp;emsp;用终端在目录下创建&lt;code&gt;index.html&lt;/code&gt;文件，输入文件内容：&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ojb&quot; data-lang=&quot;ojb&quot;&gt;&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+&amp;lt;body&amp;gt;
+&amp;lt;h1&amp;gt;Hello World&amp;lt;/h1&amp;gt;
+&amp;lt;p&amp;gt;I&#39;m hosted with GitHub Pages.&amp;lt;/p&amp;gt;
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2xwi1alwfj208c03fdfv.jpg&quot; alt=&quot;repo3 icon&quot;&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;5.将&lt;code&gt;index.html&lt;/code&gt;文件上传到github上
+&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2xwrym2soj21ak0ycgrx.jpg&quot; alt=&quot;repo3 icon&quot;&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;6.浏览器输入&lt;code&gt;(你的用户名).github.io&lt;/code&gt;，就初步看到效果啦
+&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2xwmlhawmj20qu0a4wfe.jpg&quot; alt=&quot;repo4 icon&quot;&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;三、Jekyll本地环境搭建（待完善）&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;http://jekyllcn.com&quot;&gt;Jekyll中文指导手册&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&amp;emsp;&amp;emsp;GitHub Pages为了提供对HTML内容的支持，选择了&lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll&lt;/a&gt;作为模板系统，Jekyll是一个强大的静态模板系统，作为个人博客使用，基本上可以满足要求，也能保持管理的方便。  &lt;/p&gt;
+
+&lt;p&gt;&amp;emsp;&amp;emsp;Jekyll是一种简单的、适用于博客的、静态网站生成引擎。它使用一个模板目录作为网站布局的基础框架，支持Markdown、Textile等标记语言的解析，提供了模板、变量、插件等功能，最终生成一个完整的静态Web站点。说白了就是，只要安装Jekyll的规范和结构，不用写html，就可以生成网站。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Jekyll基本结构&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&amp;emsp;&amp;emsp;Jekyll的核心其实就是一个文本的转换引擎，用你最喜欢的标记语言写文档，可以是Markdown、Textile或者HTML等等，再通过layout将文档拼装起来，根据你设置的URL规则来展现，这些都是通过严格的配置文件来定义，最终的产出就是web页面。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;|-- _config.yml
+|-- _includes
+|-- _layouts
+|   |-- default.html
+|    -- post.html
+|-- _posts
+|   |-- 2007-10-29-why-every-programmer-should-play-nethack.textile
+|    -- 2009-04-26-barcamp-boston-4-roundup.textile
+|-- _site
+ -- index.html
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;将主题下载到本地&lt;a href=&quot;https://github.com/onevcat/vno-jekyll&quot;&gt;Vno-Jekyll&lt;/a&gt;，解压到刚刚的代码仓库目录下，可以把文件夹里的文件都删了。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;安装本地&lt;code&gt;Jekyll&lt;/code&gt;环境步骤：&lt;/p&gt;
+
+&lt;p&gt;1.安装&lt;code&gt;ruby&lt;/code&gt;（去百度一下，有很多教程）&lt;/p&gt;
+
+&lt;p&gt;2.打开终端，执行&lt;code&gt;sudo gem install jekyll&lt;/code&gt;（用vpn比较快点）&lt;/p&gt;
+
+&lt;p&gt;如果是在淘宝的镜像，可能找不到&lt;code&gt;Jekyll&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-obj&quot; data-lang=&quot;obj&quot;&gt;ERROR:  Could not find a valid gem &#39;jekyll&#39; (&amp;gt;= 0), here is why:
+      Unable to download data from http://ruby.taobao.org/ - bad response Not Found 404 (http://ruby.taobao.org/latest_specs.4.8.gz)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;更换镜像：&lt;br&gt;
+&lt;code&gt;gem source -r https://ruby.taobao.org/&lt;/code&gt;  (移除淘宝镜像)&lt;br&gt;
+&lt;code&gt;gem source -a https://rubygems.org/&lt;/code&gt;  (添加新镜像)&lt;/p&gt;
+
+&lt;p&gt;查看当前镜像：&lt;code&gt;gem source&lt;/code&gt;，出现下面输出代表更换成功&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;*** CURRENT SOURCES ***
+https://rubygems.org/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;再次执行&lt;code&gt;sudo gem install jekyll&lt;/code&gt;，输入电脑密码，等待安装一会。&lt;/p&gt;
+
+&lt;p&gt;3.进入到你刚刚下载的Jekyll主体文件目录&lt;code&gt;cd /Users/Joe/Documents/git/Joe-Liuyi.github.io&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;4.执行&lt;code&gt;bundle install&lt;/code&gt;
+如果出现提示：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;-bash: bundle: command not found
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;就先安装bundle（执行&lt;code&gt;sudo gem install bundle&lt;/code&gt;），再执行此命令，见一堆绿色打印的时候说明执行命令成功。&lt;/p&gt;
+
+&lt;p&gt;5.开启Jekyll环境&lt;code&gt;bundle exec jekyll serve&lt;/code&gt;，看见下面输出代表开启成功。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;liuyideMacBook-Pro:Joe-Liuyi.github.io Joe$ bundle exec jekyll serve
+Configuration file: /Users/Joe/Documents/git/Joe-Liuyi.github.io/_config.yml
+        Source: /Users/Joe/Documents/git/Joe-Liuyi.github.io
+   Destination: /Users/Joe/Documents/git/Joe-Liuyi.github.io/_site
+Incremental build: disabled. Enable with --incremental
+  Generating... 
+                done in 0.528 seconds.
+Auto-regeneration: enabled for &#39;/Users/Joe/Documents/git/Joe-Liuyi.github.io&#39;
+Configuration file: /Users/Joe/Documents/git/Joe-Liuyi.github.io/_config.yml
+Server address: http://127.0.0.1:4000/
+Server running... press ctrl-c to stop.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;6.在浏览器输入&lt;code&gt;http://127.0.0.1:4000/&lt;/code&gt;，即可看见刚刚从网上下载的&lt;code&gt;vno-jekyll&lt;/code&gt;主体技术博客了&lt;/p&gt;
+
+&lt;p&gt;7.用git电脑终端将这些代码都上传到git代码仓库。浏览器输入&lt;code&gt;(你的用户名).github.io&lt;/code&gt;，就可以看到你的成效了。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;四、绑定个人域名&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;1.创建CNAME文件&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;在仓库根目录的&lt;code&gt;master&lt;/code&gt;分支上创建文件&lt;code&gt;CNAME&lt;/code&gt;，不带后缀。并将不带协议名的裸域名写进去(&lt;code&gt;joe-liu.com&lt;/code&gt;，而不是&lt;code&gt;http://joe-liu.com/&lt;/code&gt;)&lt;br&gt;
+如果看到绿色打钩，说明配置文件成功了。&lt;br&gt;
+这一步也可以参考&lt;a href=&quot;https://help.github.com/articles/setting-up-your-pages-site-repository/&quot;&gt;官方文档&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bgw1f2yidhzl6aj205007njro.jpg&quot; alt=&quot;cname1 icon&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bgw1f2yidihvu6j20go0bujrz.jpg&quot; alt=&quot;cname2 icon&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2yj0czpekj20dw02s0sw.jpg&quot; alt=&quot;cname3 icon&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2yj3rkqgxj20go06xdgn.jpg&quot; alt=&quot;cname4 icon&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&amp;emsp;&amp;emsp;&amp;emsp;&amp;emsp;好吧， 你直接在代码仓库里点击&lt;code&gt;New file&lt;/code&gt;也很快&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2yjq1j0k9j20b405t3z5.jpg&quot; alt=&quot;cname4 icon&quot;&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;2.购买域名&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;我是在&lt;a href=&quot;https://wanwang.aliyun.com&quot;&gt;万网&lt;/a&gt;上购买的域名，域名不一定要和github用户名一样。&lt;/p&gt;
+&lt;/blockquote&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;3.添加A记录&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;购买完，进入&lt;code&gt;管理控制台&lt;/code&gt; -&amp;gt; &lt;code&gt;云解析&lt;/code&gt; -&amp;gt; &lt;code&gt;解析&lt;/code&gt; -&amp;gt; &lt;code&gt;添加解析&lt;/code&gt; -&amp;gt; 添加&lt;code&gt;A&lt;/code&gt;记录 :&lt;br&gt;
+&lt;code&gt;192.30.252.153&lt;/code&gt;&lt;br&gt;
+&lt;code&gt;192.30.252.154&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2yim1c737j21d6068768.jpg&quot; alt=&quot;domain icon&quot;&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;4.等待DNS解析生效&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;大概十分钟内吧，奇葩情况可能要0-72小时都有可能。&lt;br&gt;
+可以在终端输入：&lt;code&gt;dig joe-liu.com +nostats +nocomments +nocmd&lt;/code&gt;，查看解析生效没。如果看到下面两条记录说明就解析好了。快输入你的域名看看效果吧。&lt;/p&gt;
+&lt;/blockquote&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;liuyideMacBook-Pro:~ Joe$ dig joe-liu.com +nostats +nocomments +nocmd
+; &amp;lt;&amp;lt;&amp;gt;&amp;gt; DiG 9.8.3-P1 &amp;lt;&amp;lt;&amp;gt;&amp;gt; joe-liu.com +nostats +nocomments +nocmd
+;; global options: +cmd
+;joe-liu.com.           IN  A
+joe-liu.com.        355 IN  A   192.30.252.153
+joe-liu.com.        355 IN  A   192.30.252.154
+joe-liu.com.        20  IN  NS  f1g1ns2.dnspod.net.
+joe-liu.com.        20  IN  NS  f1g1ns1.dnspod.net.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3&gt;五、评论功能设置&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;登录&lt;a href=&quot;https://disqus.com&quot;&gt;Disqus&lt;/a&gt;网站注册一个账号（开vpn比较快点）&lt;/li&gt;
+&lt;li&gt;点击Setting&lt;code&gt;图标&lt;/code&gt;，选择&lt;code&gt;Add disqus to site&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;点击&lt;code&gt;Start Using Engage&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;设置自己的Disqus的URL
+&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2zxj6kl8cj20go0a4756.jpg&quot; alt=&quot;disqus icon&quot;&gt;&lt;/li&gt;
+&lt;li&gt;设置根目录下&lt;code&gt;_config.yml&lt;/code&gt;文件的disqus的URL&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-obj&quot; data-lang=&quot;obj&quot;&gt;# Comment
+comment:
+    disqus: joeliu
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3&gt;六、主题细节修改&lt;/h3&gt;
+
+&lt;p&gt;&amp;emsp;&amp;emsp;一切顺利的话，你讲看到下面这个界面。接下来就将网站信息都改成自己的吧。
+&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2yk2dvkomj20jg09xmz0.jpg&quot; alt=&quot;background icon&quot;&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;1.修改个人信息&lt;/strong&gt;&lt;br&gt;
+&amp;emsp;&amp;emsp;博客名、描述、跳转链接的修改的主要文件路径是在根目录下的文件：&lt;code&gt;_config.yml&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;2.修改背景图片&lt;/strong&gt;&lt;br&gt;
+&amp;emsp;&amp;emsp;头像和背景存放路径：&lt;code&gt;代码仓库根目录&lt;/code&gt;-&amp;gt;&lt;code&gt;assets&lt;/code&gt;-&amp;gt;&lt;code&gt;image&lt;/code&gt;，直接替换文件就好了，不过要保持文件名一样。
+&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2yk5epypnj20m807ojsm.jpg&quot; alt=&quot;guide icon&quot;&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;七、写文章&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;1.存放文章位置&lt;/strong&gt;
+&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2ydn81e45j212a0jq0wr.jpg&quot; alt=&quot;article icon&quot;&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&amp;emsp;&amp;emsp;用Jekyll写博客，一篇文章就是一个文件，所有需要发表的文章都要放在&lt;code&gt;_posts&lt;/code&gt;文件夹里。文件的命名要按&lt;code&gt;YYYY-MM-DD-文章标题.markdown&lt;/code&gt;这种格式来，后缀使用&lt;code&gt;.md&lt;/code&gt;也可以。文件名一旦确定下来，就不要轻易更改，因为Jekyll结合的评论功能，会根据文件名去查找这篇文章的评论内容。同一篇文章只是更改了文件名，如下：
+&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2yecz7lggj20xc0eqq78.jpg&quot; alt=&quot;article icon&quot;&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;2.写文章工具&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&amp;emsp;&amp;emsp;推荐用&lt;a href=&quot;http://25.io/mou/&quot;&gt;Mou&lt;/a&gt;吧&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;3.书写格式&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&amp;emsp;&amp;emsp;在文章的开头，我们需要先设置头信息。头信息需要根据&lt;a href=&quot;http://yaml.org/&quot;&gt;YAML&lt;/a&gt;的格式写在两行三虚线之间。&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-obj&quot; data-lang=&quot;obj&quot;&gt;---
+layout: post
+title: 这个是标题
+date: 2016-04-16 11:11:11.000000000 +09:00
+tags: Jekyll Github
+---
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;layout&lt;/code&gt;：指文章布局的类型，需要使用指定的模版文件，模版文件放在&lt;code&gt;_layouts&lt;/code&gt;目录下，暂时用&lt;code&gt;post.html&lt;/code&gt;。&lt;code&gt;page.html&lt;/code&gt;模板比&lt;code&gt;post.html&lt;/code&gt;模板少了&lt;code&gt;更早的文章&lt;/code&gt;和&lt;code&gt;评论模块&lt;/code&gt;。有能力的也可以自己写一个文章页面的布局模板文件。&lt;br&gt;
+&lt;code&gt;title&lt;/code&gt;：文章的标题。&lt;br&gt;
+&lt;code&gt;date&lt;/code&gt;：发布文章的时间。（后面的一串零零零好像不能省）&lt;br&gt;
+&lt;code&gt;tags&lt;/code&gt;：标签，一篇文章可以设置多个标签，使用空格分割。   &lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&amp;emsp;&amp;emsp;基本上一篇文章只要用到以上一些信息就可以了，当然还有其它的变量可以设置，具体用法可以在&lt;a href=&quot;http://jekyllrb.com/docs/frontmatter/&quot;&gt;Jekyll网站&lt;/a&gt;上查看。&lt;/p&gt;
+
+&lt;p&gt;&amp;emsp;&amp;emsp;终于可以开始写文章了，一劳永逸，以后再也不用关心那些破事了，将心思放在写文章上。&lt;/p&gt;
+
+&lt;p&gt;&amp;emsp;&amp;emsp;为了写出漂亮排版的文章，需要多注意下Markdown的语法说明，第一次运行&lt;code&gt;Mou&lt;/code&gt;软件的时候，会有弹出使用语法说明，如果不小心关了，也可以在软件的菜单栏里找到 &lt;code&gt;Help -&amp;gt; Mou Help&lt;/code&gt; :
+&lt;img src=&quot;/assets/2016-04-16-used-jekyll-to-create-my-github-blog/7515e75bjw1f2yfgbcdwej20m80ettby.jpg&quot; alt=&quot;mou icon&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&amp;emsp;&amp;emsp;在写文章的时候，在终端执行&lt;code&gt;bundle exec jekyll serve&lt;/code&gt;，开启Jekyll本地环境，可以一边写博文，一边刷新&lt;code&gt;http://127.0.0.1:4000/&lt;/code&gt;地址查看实时效果。写完提交git，就完事啦。&lt;/p&gt;
+</description>
+        <pubDate>Sat, 16 Apr 2016 10:11:11 +0800</pubDate>
+        <link>http://louisly.com/2016/04/used-jekyll-to-create-my-github-blog/</link>
+        <guid isPermaLink="true">http://louisly.com/2016/04/used-jekyll-to-create-my-github-blog/</guid>
+        
+        <category>Jekyll&amp;emsp;Github</category>
+        
+        
+        <category>Jekyll</category>
+        
+        <category>Github</category>
+        
+      </item>
+    
+  </channel>
+</rss>

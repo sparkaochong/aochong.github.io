@@ -1,0 +1,52 @@
+# Basic
+title: Louis
+subtitle:
+welcome_message: <a href="https://github.com/louis-ly" target="_blank"></a>
+description: Louis的iOS开发小站
+creator: <a href="http://onev.cat">@onevcat</a>
+
+url: "http://louisly.com"
+
+permalink: /:year/:month/:title/
+
+# Format
+highlighter: rouge
+markdown: redcarpet
+redcarpet:
+  extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "strikethrough", "superscript", tables]
+
+# supported colors: blue, green, purple, red, orange or slate. If you need clear, leave it empty.
+cover_color:
+
+# The blog button should not be removed.
+blog_button:
+    title: Blog
+    description: Visit blog
+
+# Navigation buttons in the front page.
+nav:
+    # - {title: Projects, description: My Projects, url: 'http://project.onevcat.com'}
+    # - {title: Another Button, description: A button, url: 'http://example.com'}
+
+# Pagination
+gems: [jekyll-paginate]
+paginate: 10
+paginate_path: "page/:num/"
+
+# Comment
+comment:
+    disqus: louis-ly
+    duoshuo: louis-ly
+    
+# Social
+social:
+    weibo: louisCoder
+    github: louis-ly
+    twitter: louisCoder
+    gplus: 114566653125205042673
+    mail: 396868934@qq.com
+
+# Google Analytics
+ga:
+    # id: your_ga_id
+    # host: your_host

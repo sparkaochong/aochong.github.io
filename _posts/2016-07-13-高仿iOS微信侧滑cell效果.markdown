@@ -1,0 +1,227 @@
+---
+layout: post
+title: 高仿iOS微信侧滑cell效果
+date: 2016-07-13 12:36:11.000000000 +09:00
+categories: iOS
+tags: WeChat&emsp;iOS&emsp;Cell&emsp;
+
+---
+先展示三张效果图:
+
+![](http://upload-images.jianshu.io/upload_images/1812927-65eed5f2b1dae21b.gif?imageMogr2/auto-orient/strip)
+
+![](http://upload-images.jianshu.io/upload_images/1812927-97d1c995d7fff48a.gif?imageMogr2/auto-orient/strip)
+
+![](http://upload-images.jianshu.io/upload_images/1812927-f7d72aa1ffe5fbaa.gif?imageMogr2/auto-orient/strip)
+
+[项目代码](https://github.com/louis-ly/LYSideslipCell)  
+  目前，在微信里我能观察到的交互细节，基本都实现了。如果有哪儿效果不对，或者有些细节没有考虑到，还望指出。
+
+####以下是我观察到以及实现的细节:
+1.将cell向右推，向右推，移动的距离是被限制的.  
+2.将cell向右推松手之后有一个反弹的动画.
+![](http://upload-images.jianshu.io/upload_images/1812927-ac9813c251e70b2b.gif?imageMogr2/auto-orient/strip)
+
+3.将cell向左推至极限之后松手，会回弹部分.
+![](http://upload-images.jianshu.io/upload_images/1812927-52f6837022a04a5c.gif?imageMogr2/auto-orient/strip)
+
+4.侧滑出来的按钮，有一个，有两个，有自定义的
+![](http://upload-images.jianshu.io/upload_images/1812927-02a3972e71d1d01e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](http://upload-images.jianshu.io/upload_images/1812927-0cd9efc45568fe0c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](http://upload-images.jianshu.io/upload_images/1812927-bf027c52f696a0aa.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+5.当按钮出来后，除了点击按钮操作之外，无论其他什么操作，侧滑按钮都会隐藏起来。比如在松手按钮出来后，  
+1⃣️继续向左滑   
+2⃣️向右滑   
+3⃣️滑动其他cell   
+4⃣️滑动tableView     
+5⃣️点击任何个cell。 都是会触发隐藏动画.  
+![](http://upload-images.jianshu.io/upload_images/1812927-33daa934dbfcc028.gif?imageMogr2/auto-orient/strip)
+
+###实现
+  那么该注意的都列好之后，接下来就一步一步实现。
+####1.实现cell能滑动
+  首先让cell能侧滑先，那是用`scrollView`还是`pan移动手势`来实现呢?   
+  下面动画图是系统自带的侧滑效果，当你很用力向左边甩的时候，是有弹性动画，滑动的速度不同，反弹的距离也不同。然而你再回去看微信上面，无论你多么用力向左边甩，当你手抬起来的一瞬间，cell都是按照固定的速度在做移动。所以从这可以得出结论，微信是用手势来实现的侧滑.
+![](http://upload-images.jianshu.io/upload_images/1812927-180be7bb6a7b467a.gif?imageMogr2/auto-orient/strip)
+
+  那么手势是添加在self上，还是contentView上还是自定义视图？本文项目是自定义了视图，因为第六感告诉我，加在self或者contentView上也许可以实现效果，不过目测可能将会是一条崎岖的道路。
+
+
+```
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
+        [self setupSideslipCell];
+    }
+    return self;
+}
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super initWithCoder:aDecoder]) {
+        [self setupSideslipCell];
+    }
+    return self;
+}
+- (void)setupSideslipCell {
+    _containView = [UIView new];
+    _containView.backgroundColor = [UIColor lightGrayColor];  
+    NSArray *cellSubViews = self.subviews;
+    [self insertSubview:_containView atIndex:0];
+    for (UIView *subView in cellSubViews) {
+        [_containView addSubview:subView];
+    }
+    _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(containViewPan:)];
+    _panGesture.delegate = self;
+    [_containView addGestureRecognizer:_panGesture];
+}
+- (void)containViewPan:(UIPanGestureRecognizer *)pan {
+    NSLog(@"containViewPan");
+}
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    _containView.frame = self.bounds;
+}
+```
+
+  重写`initWithStyle:reuseIdentifier:`和`initWithCoder:`方法，再统一调用`setupSideslipCell`是因为，使用我们写的cell的开发者，可能是用代码创建cell，也可能用xib、storyboard来创建。那么`initWithStyle:reuseIdentifier:`这个方法代码创建之后必须会调用，而`initWithCoder:`是非代码创建cell时会调用的。（好吧，说的有点初级了）
+  接下来创建个`_containView`视图用来容纳cell上的所有视图，遍历cell目前的所有子视图都添加到`_containView`上，再添加`_panGesture`手势，移动`_containView`时，所有的内容跟着移动。
+  但是加完手势，你会发现上下左右的手势事件都被cell的获取了，使得tableView上下滚不了，一动不动。解决的方式就是实现手势代理方法`gestureRecognizerShouldBegin:`，做手势是否接收的判断.
+
+
+```
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer == _panGesture) {
+        UIPanGestureRecognizer *gesture = (UIPanGestureRecognizer *)gestureRecognizer;
+        CGPoint translation = [gesture translationInView:gesture.view];
+        return fabs(translation.y) <= fabs(translation.x);
+    }
+    return YES;
+}
+```
+
+  `fabs`是去绝对值，`fabs(translation.y) <= fabs(translation.x)`用来判断，手势是上下滑，还是左右滑。如果是上下滑，就`return NO;`不激活cell的pan手势，tableView就可以拿到移动事件了。
+
+
+  接着实现手势方法`containViewPan`，让cell动起来吧！
+
+```
+- (void)containViewPan:(UIPanGestureRecognizer *)pan {
+    CGPoint point = [pan translationInView:pan.view];
+    [pan setTranslation:CGPointZero inView:pan.view];
+    CGRect frame = _containView.frame;
+    frame.origin.x += point.x;
+    _containView.frame = frame;
+}
+```
+![](http://upload-images.jianshu.io/upload_images/1812927-9ad173c7a888333d.gif?imageMogr2/auto-orient/strip)
+
+####2.侧滑按钮的出现于消失
+  跟着应该要说创建侧面出现的侧滑按钮了。这边说起来有点复杂，我是用的autolayout约束来实现的控制侧滑按钮的宽。建议看下代码，不懂autolayout的先去补补知识。  
+  侧滑按钮主要是用了`_sideslipContainView`和`_sideslipView`视图。`_sideslipView`是加在`_sideslipContainView`上面的。`_sideslipView`的右边是紧贴`_sideslipContainView`的右边。`_sideslipView`是用来容纳侧滑按钮，`_sideslipView`的宽度是由里面按钮数量、按钮的宽度决定的，`_sideslipContainView`的右边是紧贴cell的右边，其中最重要的是`_sideslipContainView`的左边是紧贴着`_containView`的右边，所以当`_containView`没有侧滑的时候，它的右边也是紧贴着cell右边的，`_sideslipContainView`受左右约束的挤压而使得宽度为0，就看不见了。随着`_containView`因手势而像左移的时候，`_sideslipContainView`的宽度就变大，里面的子视图`_sideslipView`也就漏出来了。（这段文字显得有点惨白无力，图文又不好去创造，靠自己理解啦。如果你考虑用frame来实现，当然也是可以的，就自行发挥撒。）
+
+####3.滑动范围限制
+  下面做他的滑动范围限制。
+
+
+```
+#define LYSideslipCellLeftLimitScrollMargin 15
+#define LYSideslipCellRightLimitScrollMargin 30
+if (pan.state == UIGestureRecognizerStateChanged) {
+    CGRect frame = _containView.frame;
+    if (frame.origin.x > LYSideslipCellLeftLimitScrollMargin) {
+        frame.origin.x = LYSideslipCellLeftLimitScrollMargin;
+    } else if (frame.origin.x < -LYSideslipCellRightLimitScrollMargin - CGRectGetWidth(_sideslipView.frame)) {
+        frame.origin.x = -LYSideslipCellRightLimitScrollMargin - CGRectGetWidth(_sideslipView.frame);
+    }
+    _containView.frame = frame;
+}
+```
+
+  `LYSideslipCellLeftLimitScrollMargin`是左边能移动的最大距离，`LYSideslipCellRightLimitScrollMargin`是右边侧滑按钮出来后再接着能移动的最大距离。`CGRectGetWidth(_sideslipView.frame)`获取按钮的总宽度。
+
+####4.手势结束之后的判断
+  限制移动范围之后，在`pan.state == UIGestureRecognizerStateEnded`手势状态结束的时候判断，此时是什么状态，应该做什么样的操作及动画，动画实现都比较简单。  
+  反弹动画就是动画之后再一个反方向动画，代码如下：
+
+
+```
+_containLeftConstraint.constant = _sideslipLeftConstraint.constant = -10;
+[UIView animateWithDuration:0.25 delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
+    [self layoutIfNeeded];
+} completion:^(BOOL finished) {
+    _containLeftConstraint.constant = _sideslipLeftConstraint.constant = 0;
+    [UIView animateWithDuration:0.2 delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
+        [self layoutIfNeeded];
+    } completion:^(BOOL finished) {
+    }];
+}];
+```
+
+  要注意cell如果向右移动的距离不是很大的话，微信是没有反弹动画的。而且在动画的过程中，所有的cell，tableView上面的交互都是关闭不处理的。  
+  还有个细节可能也要在意一下，如果在做手势侧滑按钮漏出一半的过程中，突然电话或者其他事件打断之后，手势状态不一定传`UIGestureRecognizerStateEnded`，也可能是`UIGestureRecognizerStateCancelled`或其他状态，也要做相应的处理判断。
+
+####5.侧滑按钮显示后的处理
+######1⃣️当按钮显示出来的动画  
+  一旦触发的时候，就应该让所有cell以及tableView的交互关闭`[self closeAllOperation];`。动画结束后再开启交互`cell.userInteractionEnabled = YES;`，以便接收pan手势。   
+
+
+```
+- (void)showSideslipButton {
+    [self closeAllOperation];
+    _containLeftConstraint.constant = _sideslipLeftConstraint.constant = -CGRectGetWidth(_sideslipView.frame);
+    [UIView animateWithDuration:0.2 delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
+        [self layoutIfNeeded];
+    } completion:^(BOOL finished) {
+        for (LYSideslipCell *cell in self.tableView.visibleCells)
+            if ([cell isKindOfClass:LYSideslipCell.class]) {
+                cell.userInteractionEnabled = YES;
+            }
+    }];
+}
+- (void)closeAllOperation {
+    self.tableView.scrollEnabled = NO;
+    self.tableView.allowsSelection = NO;
+    for (LYSideslipCell *cell in self.tableView.visibleCells)
+        if ([cell isKindOfClass:LYSideslipCell.class]) {
+            cell.sideslip = YES;
+            cell.tapGesture.enabled = YES;
+            cell.userInteractionEnabled = NO;
+        }
+}
+```
+  在自定义cell中获取tableView的方法：
+
+```
+- (UITableView *)tableView {
+    if (!_tableView) {
+        id view = self.superview;
+        while (view && [view isKindOfClass:[UITableView class]] == NO) {
+            view = [view superview];
+        }
+        _tableView = (UITableView *)view;
+    }
+    return _tableView;
+}
+```
+
+######2⃣️继续向左滑&向右滑&滑动其他cell
+  侧滑按钮出来后，此时应该添加一个BOOL值sideslip，用来记录当前是否侧滑按钮是显示状态。且要遍历tableView可视的所有cell，将这个值都设为YES。所以一旦pan手势触发的时候，在`pan.state == UIGestureRecognizerStateBegan`的时候，判断如果`sideslip`为YES，如果是再判断手势是在侧滑按钮显示的cell上还是不在当前手势的cell上。
+
+```
+if (_containLeftConstraint.constant == 0) {
+        for (LYSideslipCell *cell in self.tableView.visibleCells)
+            if ([cell isKindOfClass:LYSideslipCell.class])
+                [cell hiddenSideslipButton];
+    } else {
+        [self hiddenSideslipButton];
+    }
+```
+  如果手势在当前cell上，那么直接调用隐藏动画。如果不在，则遍历可视cell都调用隐藏动画。为防止没有显示出侧滑按钮的cell做动画，所以在`[self hiddenSideslipButton];`方法里做判断`if (_containLeftConstraint.constant == 0) return;`
+
+######4⃣️滑动tableView
+  要使滑动tableView，就触发隐藏动画，简单的方式就是将`self.tableView.scrollEnabled = NO;`，另外在cell的pan手势代理里判断加上一句`if (!self.tableView.scrollEnabled) return YES;`，如果tableView不能滚动，cell的pan上下滑的手势也可以触发。所以把这事就扔给pan手势吧。不然还需要在内部设置`tableView.contentOffset`的`observer`，怪麻烦。
+######5⃣️点击任何个cell
+  在初始化cell的时候，就添加个tap手势，平时`enabled = NO;`不让使用。侧滑按钮出来后再设为YES。
+
+
+###END
+  自此，比较重要的点都说的差不多了。有什么疑问或建议欢迎评论里与我交流。
